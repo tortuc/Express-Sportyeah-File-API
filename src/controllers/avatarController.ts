@@ -52,6 +52,8 @@ export class AvatarController extends BaseController
 
          upload(request,response,err=>{
             if(err || !request.file){
+                console.log(err,request.file);
+                
                 response.status(HttpResponse.BadRequest).send('error-uploading-file')
             }else{
                 Avatar.new(`${request.protocol}://${request.headers.host}/v1/avatar/get/${request.file.filename}`)
