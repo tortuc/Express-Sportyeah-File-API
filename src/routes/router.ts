@@ -1,4 +1,5 @@
 import * as express from 'express';
+const version = '/v1'
 
 /**
  * Router
@@ -42,19 +43,25 @@ export class Router
          *
          * @route /v1/image/...
          */
-        this.route.use('/v1/image', require('./imagesRoutes'));
+        this.route.use(version+'/image', require('./imagesRoutes'));
         /**
          * Manejador de rutas de avatar
          *
          * @route /v1/avatar/...
          */
-        this.route.use('/v1/avatar', require('./avatarRoutes'));
+        this.route.use(version+'/avatar', require('./avatarRoutes'));
         /**
          * Manejador de rutas de Document
          *
          * @route /v1/document/...
          */
-        this.route.use('/v1/document', require('./documentRoute'));
+        this.route.use(version+'/document', require('./documentRoute'));
+        /**
+         * Manejador de rutas de Audio
+         *
+         * @route /v1/audio/...
+         */
+        this.route.use(version+'/audio', require('./audioRoute'));
 
     }
 }

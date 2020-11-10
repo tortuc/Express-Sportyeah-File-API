@@ -13,6 +13,10 @@ import * as multer from 'multer'
 
 import * as path from 'path'
 
+/**
+ * Storage para imagenes
+ */
+
 var imageStorage = multer.diskStorage({
     destination :   (req, file, cb) => {
       cb(null, path.resolve(__dirname + '/../uploads/images'))
@@ -21,6 +25,10 @@ var imageStorage = multer.diskStorage({
       cb(null, Date.now() +  path.extname(file.originalname))
     }
   })
+  
+  /**
+   * Storage para avatars
+   */
 
 var avatarStorage = multer.diskStorage({
     destination :   (req, file, cb) => {
@@ -31,6 +39,10 @@ var avatarStorage = multer.diskStorage({
     }
   })
 
+  /**
+   * Storage para documentos
+   */
+
   var documentStorage = multer.diskStorage({
     destination :   (req, file, cb) => {
       cb(null, path.resolve(__dirname + '/../uploads/documents'))
@@ -40,7 +52,19 @@ var avatarStorage = multer.diskStorage({
     }
   })
    
-   
+  
+  /**
+   * Storage para Audios
+   */
+
+  var audioStorage = multer.diskStorage({
+    destination :   (req, file, cb) => {
+      cb(null, path.resolve(__dirname + '/../uploads/audios'))
+    },
+    filename    :   (req, file, cb) => {
+      cb(null, Date.now() +  path.extname(file.originalname))
+    }
+  })
 
 
 export class Multer
@@ -62,24 +86,31 @@ export class Multer
 
 
     /**
-     * Guarda una imagen en la carpteta /views/images
+     * Guarda una imagen en la carpteta /uploads/images
      */
     public static uploadImage(){
         return multer({storage:imageStorage})
     }
 
       /**
-     * Guarda un avatar en la carpteta /views/avatars
+     * Guarda un avatar en la carpteta /uploads/avatars
      */
     public static uploadAvatar(){
         return multer({storage:avatarStorage})
     }
 
      /**
-     * Guarda un documento en la carpteta /views/docs
+     * Guarda un documento en la carpteta /uploads/documents
      */
     public static uploadDocument(){
         return multer({storage:documentStorage})
+    }
+    
+     /**
+     * Guarda un auidio en la carpteta /uploads/audios
+     */
+    public static uploadAudio(){
+        return multer({storage:audioStorage})
     }
     
   
