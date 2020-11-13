@@ -62,6 +62,12 @@ export class Router
          * @route /v1/audio/...
          */
         this.route.use(version+'/audio', require('./audioRoute'));
+        /**
+         * Manejador de rutas de Video
+         *
+         * @route /v1/video/...
+         */
+        this.route.use(version+'/video', require('./videoRoute'));
 
     }
 }

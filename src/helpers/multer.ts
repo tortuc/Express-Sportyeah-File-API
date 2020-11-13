@@ -65,6 +65,15 @@ var avatarStorage = multer.diskStorage({
       cb(null, Date.now() +  path.extname(file.originalname))
     }
   })
+  
+  var videoStorage = multer.diskStorage({
+    destination :   (req, file, cb) => {
+      cb(null, path.resolve(__dirname + '/../uploads/videos'))
+    },
+    filename    :   (req, file, cb) => {
+      cb(null, Date.now() +  path.extname(file.originalname))
+    }
+  })
 
 
 export class Multer
@@ -107,11 +116,17 @@ export class Multer
     }
     
      /**
-     * Guarda un auidio en la carpteta /uploads/audios
+     * Guarda un audio en la carpteta /uploads/audios
      */
     public static uploadAudio(){
         return multer({storage:audioStorage})
     }
+     /**
+     * Guarda un video en la carpteta /uploads/videoss
+     */
+    public static uploadVideo(){
+        return multer({storage:videoStorage})
+    }
     
-  
+   
 }

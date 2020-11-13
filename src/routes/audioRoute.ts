@@ -1,7 +1,7 @@
 import { AudioController } from '../controllers/audioController';
 
 /**
- * exampleRoute
+ * audioRoute
  * 
  * @author Jogeiker L <jogeiker1999@gmail.com>
  * @copyright JDV
@@ -17,15 +17,7 @@ const audioController = new AudioController();
  */
 const AudioRouter:any = audioController.router();
 
-/**
- * index
- * 
- * Ruta por defecto
- * 
- * @route /example/
- * @method get
- */
-AudioRouter.get('/', audioController.index);
+
 
 /**
  * Subi un audio, hay que pasarle un form data con el nombre `audio`
