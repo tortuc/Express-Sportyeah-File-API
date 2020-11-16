@@ -37,6 +37,7 @@ export class VideoController extends BaseController
 
         upload(request,response,err=>{
             if(err || !request.file){
+                console.log(err);
                 
                 response.status(HttpResponse.BadRequest).send('error-uploading-video')
             }else{
