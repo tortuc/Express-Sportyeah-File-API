@@ -51,6 +51,12 @@ export class VideoController extends BaseController
                             `${request.protocol}://${request.headers.host}/v1/video/get/${request.file.filename}`
                         )
                     })
+                    .catch((err)=>{
+                        console.log(err);
+
+                                    response.status(HttpResponse.BadRequest).send('error-uploading-video')
+    
+                    })
             }         
             
          })
