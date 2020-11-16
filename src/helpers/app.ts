@@ -47,11 +47,11 @@ export class App
     {
         // Usamos el body parser
         this.app.use(body_parser.urlencoded({ 
-            extended: false ,
-            limit:'50mb'
+            limit:Config.get('upload.maxSize'),
+            extended: true 
         }));
-
-        this.app.use(body_parser.json({limit:'50mb'}));
+        
+        this.app.use(body_parser.json({limit:Config.get('upload.maxSize')}));
 
         // Usamos CORS
         this.app.use(cors());
