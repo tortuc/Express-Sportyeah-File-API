@@ -39,6 +39,8 @@ export class VideoController extends BaseController
         console.log('video...');
         
         upload(request,response,err=>{
+            console.log('video cargado');
+            
             if(err || !request.file){
                 console.log(err);
                 
