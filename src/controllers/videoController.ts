@@ -33,9 +33,11 @@ export class VideoController extends BaseController
 
     public upload(request:Request,response:Response){
        try {
-           
-        let upload = Multer.uploadVideo().single('video')
+        console.log('uploading video...');
 
+        let upload = Multer.uploadVideo().single('video')
+        console.log('video...');
+        
         upload(request,response,err=>{
             if(err || !request.file){
                 console.log(err);
