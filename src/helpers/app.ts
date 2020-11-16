@@ -47,10 +47,11 @@ export class App
     {
         // Usamos el body parser
         this.app.use(body_parser.urlencoded({ 
-            extended: false 
+            extended: false ,
+            limit:'50mb'
         }));
 
-        this.app.use(body_parser.json());
+        this.app.use(body_parser.json({limit:'50mb'}));
 
         // Usamos CORS
         this.app.use(cors());
