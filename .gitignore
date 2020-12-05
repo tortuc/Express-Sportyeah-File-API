@@ -1,3 +1,8 @@
 build
 node_modules
 package-lock.json
+/src/uploads/audios/*
+/src/uploads/documents/*
+/src/uploads/images/*
+/src/uploads/videos/*
+/src/uploads/avatars/*
