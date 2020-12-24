@@ -62,7 +62,7 @@ var avatarStorage = multer.diskStorage({
       cb(null, path.resolve(__dirname + '/../uploads/audios'))
     },
     filename    :   (req, file, cb) => {
-      cb(null, Date.now() +  path.extname(file.originalname))
+      cb(null, Date.now() + '.mp3')
     }
   })
   
