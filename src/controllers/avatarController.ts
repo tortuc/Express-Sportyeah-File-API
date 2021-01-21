@@ -58,7 +58,7 @@ export class AvatarController extends BaseController
             }else{
                 Avatar.new(`${request.protocol}://${request.headers.host}/v1/avatar/get/${request.file.filename}`)
                     .then((avatar)=>{
-                        response.status(HttpResponse.Ok).json(avatar.url)
+                        response.status(HttpResponse.Ok).json(avatar)
                     })
             }         
             
