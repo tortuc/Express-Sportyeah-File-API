@@ -3,9 +3,9 @@ import { HttpResponse } from '../helpers/httpResponse';
 import { Request, Response } from 'express';
 import { Multer } from '../helpers/multer';
 import * as fs from 'fs'
-
 import * as path from 'path'
 import Image from '../models/image';
+import https = require('https');
 /**
  * ImageController
  * 
@@ -78,7 +78,31 @@ export class ImageController extends BaseController
                 response.end(content);
             }
         });
+    }
+
+    /**
+      * Subir imagen desde URL
+     * @route /v1/image/uploadFromUrl
+     * @method POST 
+     */
+    public async uploadImageFromUrl(request:Request,response:Response) {
+        const { url } = request.body;
+
+        var imageName = Date.now()+'.jpg';
+        var file = fs.createWriteStream(path.resolve(__dirname + '/../uploads/images/'+imageName));
+
+        var res = https.get(url, ( resp ) => {
             
-     
+            if(resp.statusCode == 200) {
+                resp.pipe(file)
+                Image.new(`${request.protocol}://${request.headers.host}/v1/image/get/${imageName}`)
+                    .then((image)=>{
+                        response.status(HttpResponse.Ok).json(image.url)
+                    })
+            }else{
+                response.status(HttpResponse.BadRequest).send('error-uploading-file')
+            }         
+        })
+
     }
 }
