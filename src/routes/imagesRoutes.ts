@@ -36,6 +36,15 @@ ImagesRouter.get('/', imageController.index);
  */
 ImagesRouter.post('/upload', imageController.uploadImage);
 
+/**
+ * Subir imagen desde url
+ * 
+ * 
+ * @route /v1/image/upload
+ * @method post
+ */
+ImagesRouter.post('/uploadFromUrl', imageController.uploadImageFromUrl);
+
  /**
  * Obtener una imagen
  * 
