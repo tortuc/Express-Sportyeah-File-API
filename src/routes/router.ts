@@ -69,5 +69,12 @@ export class Router
          */
         this.route.use(version+'/video', require('./videoRoute'));
 
+        /**
+         * Manejador de rutas de Video
+         *
+         * @route /v1/background/...
+         */
+        this.route.use(version+'/background', require('./backgroundsRoute'));
+
     }
 }

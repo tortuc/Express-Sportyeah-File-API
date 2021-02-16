@@ -5,7 +5,6 @@ import { Multer } from '../helpers/multer';
 import * as fs from 'fs'
 
 import * as path from 'path'
-import Image from '../models/image';
 import Avatar from '../models/avatar';
 /**
  * AvatarController

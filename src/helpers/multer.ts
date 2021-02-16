@@ -40,6 +40,20 @@ var avatarStorage = multer.diskStorage({
   })
 
   /**
+  /**
+   * Storage para los backgrounds de los eventos
+   */
+
+var backgroundStorage = multer.diskStorage({
+    destination :   (req, file, cb) => {
+      cb(null, path.resolve(__dirname + '/../uploads/backgrounds'))
+    },
+    filename    :   (req, file, cb) => {
+      cb(null, Date.now() +  path.extname(file.originalname))
+    }
+  })
+
+  /**
    * Storage para documentos
    */
 
@@ -113,6 +127,13 @@ export class Multer
      */
     public static uploadDocument(){
         return multer({storage:documentStorage})
+    }
+
+     /**
+     * Guarda un documento en la carpteta /uploads/documents
+     */
+    public static uploadBackground(){
+        return multer({storage:backgroundStorage})
     }
     
      /**
