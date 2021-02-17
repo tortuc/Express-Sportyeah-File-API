@@ -6,3 +6,4 @@ package-lock.json
 /src/uploads/images/*
 /src/uploads/videos/*
 /src/uploads/avatars/*
+/src/uploads/backgrounds/*
