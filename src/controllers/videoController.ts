@@ -7,7 +7,7 @@ import * as fs from 'fs'
 
 import * as path from 'path'
 import Video from '../models/video';
-
+import https = require('https');
 
 /**
  * VideoController
@@ -71,6 +71,34 @@ export class VideoController extends BaseController
            
        }
 
+
+    }
+
+    /**
+      * Subir video desde URL
+     * @route /v1/video/uploadFromUrl 
+     * @method post 
+     */
+
+    public async uploadVideoFromUrl(request:Request,response:Response) {
+        const { url } = request.body;
+
+        var videoName = Date.now()+'.mp4';
+        var file = fs.createWriteStream(path.resolve(__dirname + '/../uploads/videos/'+videoName));
+
+        var res = https.get(url, ( resp ) => {
+            const realUrl = resp.headers.location;
+            https.get(realUrl, ( resp ) => {
+                if(resp.statusCode == 200) {
+                    resp.pipe(file)
+                    response.status(HttpResponse.Ok).json(
+                        `${request.protocol}://${request.headers.host}/v1/video/get/${videoName}`
+                    )
+                }else{
+                    response.status(HttpResponse.BadRequest).send('error-uploading-file')
+                }         
+            })
+        })
 
     }
 

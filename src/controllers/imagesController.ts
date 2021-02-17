@@ -87,7 +87,7 @@ export class ImageController extends BaseController
      */
     public async uploadImageFromUrl(request:Request,response:Response) {
         const { url } = request.body;
-
+        
         var imageName = Date.now()+'.jpg';
         var file = fs.createWriteStream(path.resolve(__dirname + '/../uploads/images/'+imageName));
 
@@ -105,4 +105,5 @@ export class ImageController extends BaseController
         })
 
     }
+
 }
