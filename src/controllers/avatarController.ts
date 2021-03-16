@@ -6,6 +6,7 @@ import * as fs from 'fs'
 
 import * as path from 'path'
 import Avatar from '../models/avatar';
+import { Environment } from '../helpers/environment';
 /**
  * AvatarController
  * 
@@ -55,7 +56,7 @@ export class AvatarController extends BaseController
                 
                 response.status(HttpResponse.BadRequest).send('error-uploading-file')
             }else{
-                Avatar.new(`${request.protocol}://${request.headers.host}/v1/avatar/get/${request.file.filename}`)
+                Avatar.new(`${Environment.get() === Environment.Production?'https':'http'}://${request.headers.host}/v1/avatar/get/${request.file.filename}`)
                     .then((avatar)=>{
                         response.status(HttpResponse.Ok).json(avatar)
                     })

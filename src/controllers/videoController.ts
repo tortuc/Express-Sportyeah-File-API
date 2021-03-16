@@ -8,6 +8,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import Video from '../models/video';
 import https = require('https');
+import { Environment } from '../helpers/environment';
 
 /**
  * VideoController
@@ -54,7 +55,7 @@ export class VideoController extends BaseController
                     .then((video)=>{
                         
                         response.status(HttpResponse.Ok).json(
-                            `${request.protocol}://${request.headers.host}/v1/video/get/${request.file.filename}`
+                            `${Environment.get() === Environment.Production?'https':'http'}://${request.headers.host}/v1/video/get/${request.file.filename}`
                         )
                     })
                     .catch((err)=>{
@@ -92,7 +93,7 @@ export class VideoController extends BaseController
                 if(resp.statusCode == 200) {
                     resp.pipe(file)
                     response.status(HttpResponse.Ok).json(
-                        `${request.protocol}://${request.headers.host}/v1/video/get/${videoName}`
+                        `${Environment.get() === Environment.Production?'https':'http'}://${request.headers.host}/v1/video/get/${videoName}`
                     )
                 }else{
                     response.status(HttpResponse.BadRequest).send('error-uploading-file')

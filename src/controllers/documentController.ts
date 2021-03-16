@@ -6,6 +6,7 @@ import * as fs from 'fs'
 
 import * as path from 'path'
 import Document from '../models/document';
+import { Environment } from '../helpers/environment';
 /**
  * DocumentController
  * 
@@ -59,7 +60,7 @@ export class DocumentController extends BaseController
                     .then((document)=>{
                         response.status(HttpResponse.Ok).json({
                             name:document.originalName,
-                            url:`${request.protocol}://${request.headers.host}/v1/document/download/${request.file.filename}`
+                            url:`${Environment.get() === Environment.Production?'https':'http'}://${request.headers.host}/v1/document/download/${request.file.filename}`
                         })
                     })
             }         

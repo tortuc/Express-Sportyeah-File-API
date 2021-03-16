@@ -5,6 +5,7 @@ import { Multer } from "../helpers/multer";
 import * as fs from "fs";
 import * as path from "path";
 import EventBackground from "../models/eventBackground";
+import { Environment } from "../helpers/environment";
 /**
  * AvatarController
  *
@@ -53,7 +54,7 @@ export class EventBackgroundController extends BaseController {
         response.status(HttpResponse.BadRequest).send("error-uploading-file");
       } else {
         EventBackground.new({
-          url: `${request.protocol}://${request.headers.host}/v1/background/get/${request.file.filename}`,
+          url: `${Environment.get() === Environment.Production?'https':'http'}://${request.headers.host}/v1/background/get/${request.file.filename}`,
           appName,
           typeEvent
         }).then((background) => {

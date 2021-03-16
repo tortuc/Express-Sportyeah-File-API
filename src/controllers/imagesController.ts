@@ -54,7 +54,7 @@ export class ImageController extends BaseController
             if(err || !request.file){
                 response.status(HttpResponse.BadRequest).send('error-uploading-file')
             }else{
-                Image.new(`${request.protocol}://${request.headers.host}/v1/image/get/${request.file.filename}`)
+                Image.new(`${Environment.get() === Environment.Production?'https':'http'}://${request.headers.host}/v1/image/get/${request.file.filename}`)
                     .then((image)=>{
                         response.status(HttpResponse.Ok).json(image.url)
                     })
@@ -96,7 +96,7 @@ export class ImageController extends BaseController
             
             if(resp.statusCode == 200) {
                 resp.pipe(file)
-                Image.new(`${request.protocol}://${request.headers.host}/v1/image/get/${imageName}`)
+                Image.new(`${Environment.get() === Environment.Production?'https':'http'}://${request.headers.host}/v1/image/get/${imageName}`)
                     .then((image)=>{
                         response.status(HttpResponse.Ok).json(image.url)
                     })

@@ -58,7 +58,7 @@ export class AudioController extends BaseController
                     .then((audio)=>{
                         
                         response.status(HttpResponse.Ok).json(
-                            `${request.protocol}://${request.headers.host}/v1/audio/get/${request.file.filename}`
+                            `${Environment.get() === Environment.Production?'https':'http'}://${request.headers.host}/v1/audio/get/${request.file.filename}`
                         )
                     })
             }         
