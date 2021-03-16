@@ -2,17 +2,17 @@
   "name": "jdvimage",
   "version": "1.0.0",
   "description": "Guarda tus imagenes y archivos...",
-  "main": "app.js",
+  "main": "image.js",
   "repository": {
     "type": "git",
     "url": " git+ssh://ubuntu@kudiska.com/var/git/backend.git"
   },
   "scripts": {
     "tsc": "tsc --watch",
-    "start": "cd build && node app.js",
+    "start": "cd build && node image.js",
     "build": "mkdir -p build && cp package.json build/ && cd build && npm install && cd .. && cp ./src/app.config ./build && mkdir -p ./build/uploads && cp -rf ./src/uploads/* ./build/uploads && tsc",
     "test": "echo \"Error: no hay tests para ejecutar\" && exit 1",
-    "dev": "nodemon src/app.ts"
+    "dev": "nodemon src/image.ts"
   },
   "keywords": [],
   "author": "JDV",
