@@ -6,6 +6,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import Image from '../models/image';
 import https = require('https');
+import { Environment } from '../helpers/environment';
 /**
  * ImageController
  * 
@@ -35,7 +36,7 @@ export class ImageController extends BaseController
     public index(request:Request, response:Response)
     {
         // Envía una respuesta
-        response.status(HttpResponse.Ok).send(`[OK] Mensaje de bienvenida enviado con éxito`);
+        response.status(HttpResponse.Ok).send(`[OK] Mensaje de bienvenida enviado con éxito ${Environment.get()}`);
     }
 
 
