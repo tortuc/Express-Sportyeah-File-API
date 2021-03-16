@@ -82,21 +82,7 @@ export class App
             // El servidor
             let server:any = null;
 
-            // En producción lanza el servidor con SSL
-            if (Environment.get() == Environment.Production) {
-                console.info(`[OK] ${moment} Servidor de producción configurado. Dirección ip: ${ip}`);
-                server = require('https').createServer(
-                {
-                    key  : fs.readFileSync(Config.get('ssl.key'), 'utf8'),
-                    cert : fs.readFileSync(Config.get('ssl.cert'), 'utf8'),
-                    ca   : fs.readFileSync(Config.get('ssl.ca'), 'utf8')
-                }, 
-                this.app).listen(Config.get('app.port'));
-
-                resolve(server);
-
-            } else {
-                // En desarrollo se puede lanzar un servidor no seguro
+           // En desarrollo se puede lanzar un servidor no seguro
                 server = require('http').createServer(this.app).listen(Config.get('app.port'), () => {
                 
                     console.info(`[OK] ${moment} Servidor de desarrollo configurado. Dirección ip: ${ip}`);
@@ -111,7 +97,6 @@ export class App
                             process.exit();
                         }
                 });
-            }
         });
     }
 
