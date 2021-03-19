@@ -41,7 +41,7 @@ const Avatar = typedModel('Avatar', schema, undefined, undefined,
          * @param {Types.ObjectId} id id del avatar
          */
         async delete(id){
-            return Avatar.findByIdAndUpdate(id,{deleted:true})
+            return Avatar.findByIdAndUpdate(id,{deleted:true},{new:true})
         }
 
         
