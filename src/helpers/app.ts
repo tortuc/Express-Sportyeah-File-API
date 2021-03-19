@@ -54,7 +54,7 @@ export class App
         this.app.use(body_parser.json({limit:Config.get('upload.maxSize')}));
 
         // Usamos CORS
-        this.app.use(cors({origin:['https://app.sportyeah.com']}));
+        this.app.use(cors({origin:['https://app.sportyeah.com','https://admin.kecuki.com','https://app.kecuki.com']}));
         this.app.options('*', cors());
     }
 
