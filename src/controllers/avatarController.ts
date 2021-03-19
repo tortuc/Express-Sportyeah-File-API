@@ -98,8 +98,8 @@ export class AvatarController extends BaseController
 
     public deleteAvatar(request:Request,response:Response){
         Avatar.delete(request.params.id)
-            .then(()=>{   
-                response.status(HttpResponse.Ok).json({ok:true})
+            .then((avatar)=>{   
+                response.status(HttpResponse.Ok).json(avatar)
             })
             .catch(()=>{
                 response.status(HttpResponse.BadRequest).send('Something wrong')
