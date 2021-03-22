@@ -1,218 +1,231 @@
 /**
  * App
- * 
+ *
  * @author Jogeiker L <jogeiker1999@gmail.com>
  * @copyright JDV
  */
 
-import * as express from 'express';
-import * as body_parser from 'body-parser';
-import * as cors from 'cors';
+import * as express from "express";
+import * as body_parser from "body-parser";
+import * as cors from "cors";
 
-import { Environment } from './environment';
-import { Config } from './config';
-import { Router } from '../routes/router';
-import { Mongoose } from './mongoose';
+import { Environment } from "./environment";
+import { Config } from "./config";
+import { Router } from "../routes/router";
+import { Mongoose } from "./mongoose";
 
-export class App
-{
-    /**
-     * Instancia única de esta clase
-     * Es un Singleton
-     */
-    private static instance:App = null;
+export class App {
+  /**
+   * Instancia única de esta clase
+   * Es un Singleton
+   */
+  private static instance: App = null;
 
-    /**
-     * La aplicación
-     */
-    public app:express.Express;
+  /**
+   * La aplicación
+   */
+  public app: express.Express;
 
-    /**
-     * El constructor es privado
-     */
-    private constructor () 
-    {           
-        // Iniciamos el Framework express      
-        this.app = express();
+  /**
+   * El constructor es privado
+   */
+  private constructor() {
+    // Iniciamos el Framework express
+    this.app = express();
 
-        this.config();
-    }
+    this.config();
+  }
 
-    /**
-     * Configura la aplicación
-     * 
-     * @param {void}
-     */
-    private config():void
-    {
-        // Usamos el body parser
-        this.app.use(body_parser.urlencoded({ 
-            limit:Config.get('upload.maxSize'),
-            extended: true 
-        }));
-        
-        this.app.use(body_parser.json({limit:Config.get('upload.maxSize')}));
+  /**
+   * Configura la aplicación
+   *
+   * @param {void}
+   */
+  private config(): void {
+    // Usamos el body parser
+    this.app.use(
+      express.urlencoded({
+        limit: Config.get("upload.maxSize"),
+        extended: true,
+      })
+    );
 
-        // Usamos CORS
-        this.app.use(cors({origin:['https://app.sportyeah.com','https://admin.kecuki.com','https://app.kecuki.com']}));
-        this.app.options('*', cors());
-    }
+    this.app.use(express.json({ limit: Config.get("upload.maxSize") }));
 
-    /**
-     * Inicia el servidor
-     * 
-     * @return {Promise}
-     */
-    private startServer():Promise<any>
-    {
-        return new Promise((resolve, reject) => {
-            
-            // Obtiene la dirección ip del servidor
-            let ip      = require('ip').address();
+    // Usamos CORS
+    this.app.use(
+      cors({
+        origin: [
+          "https://app.sportyeah.com",
+          "https://admin.kecuki.com",
+          "https://app.kecuki.com",
+          "http://localhost:8100",
+        ],
+      })
+    );
+    this.app.options("*", cors());
+  }
 
-            //
-            // Carga los certificados de seguridad SSL de Let's Encrypt
-            // 
-            
-            let fs = require('fs');
-            
-            // El momento actual
-            let moment:string = new Date().toLocaleTimeString()
+  /**
+   * Inicia el servidor
+   *
+   * @return {Promise}
+   */
+  private startServer(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      // Obtiene la dirección ip del servidor
+      let ip = require("ip").address();
 
-            // El servidor
-            let server:any = null;
+      //
+      // Carga los certificados de seguridad SSL de Let's Encrypt
+      //
 
-           // En desarrollo se puede lanzar un servidor no seguro
-                server = require('http').createServer(this.app).listen(Config.get('app.port'), () => {
-                
-                    console.info(`[OK] ${moment} Servidor de desarrollo configurado. Dirección ip: ${ip}`);
+      let fs = require("fs");
 
-                    resolve(server);
-                }).on('error', (error: { errno: string; }) => {
-                        if(error.errno === 'EADDRINUSE') {
-                            console.log(`[ERROR] El puerto ${Config.get('app.port')} está ya siendo utilizado por otra aplicación`);
-                            process.exit();
-                        } else {
-                            console.error(`[ERROR] ${error}`);
-                            process.exit();
-                        }
-                });
+      // El momento actual
+      let moment: string = new Date().toLocaleTimeString();
+
+      // El servidor
+      let server: any = null;
+
+      // En desarrollo se puede lanzar un servidor no seguro
+      server = require("http")
+        .createServer(this.app)
+        .listen(Config.get("app.port"), () => {
+          console.info(
+            `[OK] ${moment} Servidor de desarrollo configurado. Dirección ip: ${ip}`
+          );
+
+          resolve(server);
+        })
+        .on("error", (error: { errno: string }) => {
+          if (error.errno === "EADDRINUSE") {
+            console.log(
+              `[ERROR] El puerto ${Config.get(
+                "app.port"
+              )} está ya siendo utilizado por otra aplicación`
+            );
+            process.exit();
+          } else {
+            console.error(`[ERROR] ${error}`);
+            process.exit();
+          }
         });
+    });
+  }
+
+  /**
+   * Rutas de la aplicación
+   *
+   * @return {Router}
+   */
+  private route(): Router {
+    // Inicia el router
+    return new Router(this.app);
+  }
+
+  /**
+   * Obtiene la aplicación actual
+   *
+   * @return {App}
+   */
+  public static get(): App {
+    if (!App.instance) {
+      App.instance = new App();
     }
 
-    /**
-     * Rutas de la aplicación
-     * 
-     * @return {Router}
-     */
-    private route():Router
-    {
-        // Inicia el router
-        return new Router(this.app);
-    }
+    return App.instance;
+  }
 
-    /**
-     * Obtiene la aplicación actual
-     * 
-     * @return {App}
-     */
-    public static get():App
-    {
-        if (!App.instance) {
-            App.instance = new App();
-        }
+  /**
+   * Ejecuta la aplicación
+   *
+   * @return {void}
+   */
+  public static run(): void {
+    // Obtiene la aplicación
+    let application: App = App.get();
 
-        return App.instance;
-    }
+    // El momento actual
+    let moment: string = new Date().toLocaleTimeString();
 
-    /**
-     * Ejecuta la aplicación
-     * 
-     * @return {void}
-     */
-    public static run():void
-    {
-        // Obtiene la aplicación
-        let application:App = App.get();
+    console.info(
+      `[OK] ${moment} Aplicación ${Config.get("app.name")} ${Config.get(
+        "app.version"
+      )} iniciada. Escuchando peticiones en el puerto ${Config.get("app.port")}`
+    );
 
+    // Inicia el servidor
+    application.startServer().then(() => {
+      // Carga las rutas de la aplicación
+      application.route();
+
+      console.info(`[OK] ${moment} Las rutas han sido cargadas con éxito`);
+
+      // Inicia la conexión a Mongo
+      Mongoose.startConnection();
+
+      // Configura el motor de plantillas
+      application.setupTemplateEngine();
+    });
+  }
+
+  /**
+   * Configura el motor de plantillas
+   *
+   * @return {void}
+   */
+  private setupTemplateEngine(): void {
+    const engine: string = Config.get("views.engine");
+
+    switch (engine) {
+      case "hbs":
+        this.setupHbsTemplateEngine();
+        break;
+      default:
         // El momento actual
-        let moment:string = new Date().toLocaleTimeString();
+        let moment: string = new Date().toLocaleTimeString();
 
-        console.info(`[OK] ${moment} Aplicación ${Config.get('app.name')} ${Config.get('app.version')} iniciada. Escuchando peticiones en el puerto ${Config.get('app.port')}`);
-
-        // Inicia el servidor
-        application.startServer()
-            .then(() => {
-                // Carga las rutas de la aplicación
-                application.route();
-
-                console.info(`[OK] ${moment} Las rutas han sido cargadas con éxito`);
-
-                // Inicia la conexión a Mongo
-                Mongoose.startConnection();
-
-                // Configura el motor de plantillas
-                application.setupTemplateEngine();
-            });
+        throw `[ERROR] ${moment} El motor de plantillas especificado ${engine} no es válido`;
     }
+  }
 
-      /**
-     * Configura el motor de plantillas
-     * 
-     * @return {void}
-     */
-    private setupTemplateEngine():void
-    {
-        const engine:string = Config.get('views.engine');
+  /**
+   * Configura el motor de plantillas handlebars (hbs)
+   *
+   * @link https://handlebarsjs.com/guide/#what-is-handlebars
+   */
+  private setupHbsTemplateEngine(): void {
+    // La carpeta que contiene las vistas
+    const viewsFolder: string = require("path").resolve(
+      `${__dirname}/../${Config.get("views.hbs.folder")}`
+    );
 
-        switch (engine)
-        {
-            case 'hbs':
-                this.setupHbsTemplateEngine();
-                break;
-            default:
-                // El momento actual
-                let moment:string = new Date().toLocaleTimeString();
+    // La carpeta que contiene las vistas
+    const partialsFolder: string = Config.get("views.hbs.partials");
 
-                throw `[ERROR] ${moment} El motor de plantillas especificado ${engine} no es válido`;
-        }
-    }
+    // El layout por defecto
+    const defaultLayout: any = Config.get("views.hbs.defaultLayout");
 
-    /**
-     * Configura el motor de plantillas handlebars (hbs)
-     * 
-     * @link https://handlebarsjs.com/guide/#what-is-handlebars
-     */
-    private setupHbsTemplateEngine():void
-    {
-        // La carpeta que contiene las vistas
-        const viewsFolder:string = require('path').resolve(`${__dirname}/../${Config.get('views.hbs.folder')}`);
+    // La extensión que se usa para las vistas
+    const viewsExtension: string = Config.get("views.hbs.extension");
 
-        // La carpeta que contiene las vistas
-        const partialsFolder:string = Config.get('views.hbs.partials');
+    // Carga express-handlebars
+    // @link https://www.npmjs.com/package/express-hbs
+    const hbs = require("express-handlebars");
 
-        // El layout por defecto
-        const defaultLayout:any = Config.get('views.hbs.defaultLayout');
+    const handlebars = hbs.create({
+      partialsDir: `${viewsFolder}/${partialsFolder}`,
+      defaultLayout: defaultLayout,
+      extname: viewsExtension,
+    });
 
-        // La extensión que se usa para las vistas
-        const viewsExtension:string = Config.get('views.hbs.extension');
+    this.app.engine(viewsExtension, handlebars.engine);
 
-        // Carga express-handlebars
-        // @link https://www.npmjs.com/package/express-hbs
-        const hbs = require('express-handlebars');
+    // Fija la carpeta que contiene las vistas
+    this.app.set("views", viewsFolder);
 
-        const handlebars = hbs.create({
-            partialsDir: `${viewsFolder}/${partialsFolder}`,
-            defaultLayout: defaultLayout,
-            extname: viewsExtension
-        });
-          
-        this.app.engine(viewsExtension, handlebars.engine);
-
-        // Fija la carpeta que contiene las vistas
-        this.app.set('views', viewsFolder);
-    
-        // Fija la extensión de las vistas
-        this.app.set('view engine', viewsExtension);
-    }
+    // Fija la extensión de las vistas
+    this.app.set("view engine", viewsExtension);
+  }
 }
