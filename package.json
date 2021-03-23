@@ -4,8 +4,7 @@
   "description": "Guarda tus imagenes y archivos...",
   "main": "image.js",
   "repository": {
-    "type": "git",
-    "url": " git+ssh://ubuntu@kudiska.com/var/git/backend.git"
+    "type": "git"
   },
   "scripts": {
     "tsc": "tsc --watch",
