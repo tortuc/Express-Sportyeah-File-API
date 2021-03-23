@@ -60,6 +60,8 @@ export class App {
           "https://admin.kecuki.com",
           "https://app.kecuki.com",
           "http://localhost:8100",
+          "capacitor://localhost",
+          "http://localhost"
         ],
       })
     );
