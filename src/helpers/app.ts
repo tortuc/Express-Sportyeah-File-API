@@ -61,11 +61,10 @@ export class App {
           "https://app.kecuki.com",
           "http://localhost:8100",
           "capacitor://localhost",
-          "http://localhost"
+          "http://localhost",
         ],
       })
     );
-    // this.app.options("*", cors());
   }
 
   /**
