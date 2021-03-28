@@ -65,7 +65,7 @@ export class App {
         ],
       })
     );
-    this.app.options("*", cors());
+    // this.app.options("*", cors());
   }
 
   /**
