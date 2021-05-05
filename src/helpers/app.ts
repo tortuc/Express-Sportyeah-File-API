@@ -6,10 +6,8 @@
  */
 
 import * as express from "express";
-import * as body_parser from "body-parser";
 import * as cors from "cors";
 
-import { Environment } from "./environment";
 import { Config } from "./config";
 import { Router } from "../routes/router";
 import { Mongoose } from "./mongoose";
@@ -58,8 +56,10 @@ export class App {
         origin: [
           "https://app.sportyeah.com",
           "https://admin.kecuki.com",
+          "https://admin.sportyeah.com",
           "https://app.kecuki.com",
           "http://localhost:8100",
+          "http://localhost:4200",
           "capacitor://localhost",
           "http://localhost",
         ],
