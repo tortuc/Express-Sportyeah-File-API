@@ -2,9 +2,13 @@ import { BaseController } from './baseController';
 import { HttpResponse } from '../helpers/httpResponse';
 import { Request, Response } from 'express';
 import { Multer } from '../helpers/multer';
+import { Watermark } from '../helpers/watermark';
 import Audio from '../models/audio';
 import * as fs from 'fs'
+const exec = require("child_process").execSync;
 
+//var ffmpeg = require('ffmpeg');
+const ffmpeg = require('fluent-ffmpeg');
 import * as path from 'path'
 import Video from '../models/video';
 import https = require('https');
@@ -19,6 +23,10 @@ import { Environment } from '../helpers/environment';
  * @copyright JDV
  */
  
+ async function myAwesomeFunction() {
+    setTimeout(() => {}, 100, "foo");
+  }
+
 export class VideoController extends BaseController
 {
     /**
@@ -30,15 +38,23 @@ export class VideoController extends BaseController
         super();
     }
 
+
+    
  
 
-    public upload(request:Request,response:Response){
+    public  upload(request:Request,response:Response){
        try {
+
         console.log('uploading video...');
 
+        const VIDEO_PATH = path.resolve(__dirname + '/../uploads/videos/')+'/1621899462674.mp4';
+        const WATERMARK_PATH = path.resolve(__dirname + '/../uploads/videos/')+'/logo-hive.png';
+
         let upload = Multer.uploadVideo().single('video')
+
         console.log('video...');
-        
+
+       
         upload(request,response,err=>{
             console.log('video cargado');
             
@@ -53,6 +69,11 @@ export class VideoController extends BaseController
                     
                 })
                     .then((video)=>{
+
+                        console.log(request.body)
+
+                        const watermarkR = new Watermark();
+                        watermarkR.createVideoWatermark(request.file.filename,request.body.user)
                         
                         response.status(HttpResponse.Ok).json(
                             `${Environment.get() === Environment.Production?'https':'http'}://${request.headers.host}/v1/video/get/${request.file.filename}`
