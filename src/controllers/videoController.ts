@@ -42,7 +42,7 @@ export class VideoController extends BaseController
     
  
 
-    public  upload(request:Request,response:Response){
+    public async upload(request:Request,response:Response){
        try {
 
         console.log('uploading video...');
