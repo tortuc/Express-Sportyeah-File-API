@@ -54,4 +54,14 @@ ImagesRouter.post('/uploadFromUrl', imageController.uploadImageFromUrl);
   */
 ImagesRouter.get('/get/:image', imageController.getImage)
 
+ /**
+ * Obtiene la informacion de los videos
+ * 
+ * 
+ * @route /v1/video/info
+ * @method get 
+  */
+  ImagesRouter.get('/info', imageController.getTotalImages)
+
+
 module.exports = ImagesRouter;

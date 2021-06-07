@@ -43,5 +43,23 @@ VideoRouter.post('/upload',videoController.upload)
  * @method get 
   */
  VideoRouter.get('/get/:video', videoController.getVideo)
+ /**
+ * Obtiene la informacion de los videos
+ * 
+ * 
+ * @route /v1/video/info
+ * @method get 
+  */
+ VideoRouter.get('/info', videoController.getTotalVideos)
+ /**
+ * Obtiene la informacion de los videos
+ * 
+ * 
+ * @route /v1/video/info
+ * @method get 
+  */
+ VideoRouter.get('/test', videoController.testFfmpeg)
+
+ 
 
 module.exports = VideoRouter;
