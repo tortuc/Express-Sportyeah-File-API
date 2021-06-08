@@ -10,16 +10,16 @@ module.exports = {
       env_production: {
         NODE_ENV: "production",
       },
-      env_production_sportyeah: {
-        NODE_ENV: "production",
-        app:"sportyeah"
+      // env_production_sportyeah: {
+      //   NODE_ENV: "production",
+      //   app:"sportyeah"
 
-      },
-      env_production_kecuki: {
-        NODE_ENV: "production",
-        app:"kecuki"
+      // },
+      // env_production_kecuki: {
+      //   NODE_ENV: "production",
+      //   app:"kecuki"
 
-      },
+      // },
     },
   ],
 };
