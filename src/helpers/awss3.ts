@@ -11,15 +11,15 @@
 
 import path = require("path");
 import fs = require("fs");
- import AWS = require('aws-sdk');
- 
- //configuring the AWS environment
- AWS.config.update({
-     accessKeyId: "AKIAVAPQDXHEDVMLW5FE",
-     secretAccessKey: "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"
-   });
- 
- var s3 = new AWS.S3();
+import AWS = require("aws-sdk");
+
+//configuring the AWS environment
+AWS.config.update({
+  accessKeyId: "AKIAVAPQDXHEDVMLW5FE",
+  secretAccessKey: "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",
+});
+
+var s3 = new AWS.S3();
 
 export class AWSS3 {
   /**s
@@ -33,21 +33,21 @@ export class AWSS3 {
    * Crea un storage para las imagenes
    */
 
-  public static s3 = s3
+  public static s3 = s3;
 
-  public static async uploadToS3(originalPath:string,Key:string,Bucket:string) {
+  public static async uploadToS3(
+    originalPath: string,
+    Key: string,
+    Bucket: string
+  ) {
     console.log(Bucket);
-    
+
     var params = {
       Bucket,
-      Body : fs.createReadStream(originalPath),
-      Key
+      Body: fs.createReadStream(originalPath),
+      Key,
     };
-    
-  
-    return s3.upload(params).promise()
-   
+
+    return s3.upload(params).promise();
   }
-
-
 }
