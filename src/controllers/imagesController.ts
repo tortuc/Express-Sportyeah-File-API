@@ -105,7 +105,19 @@ export class ImageController extends BaseController {
       response.writeHead(200, { "Content-type": "image/jpg" });
       response.end(data.Body);
     } catch (error) {
-      response.status(HttpResponse.BadRequest).send("not-found");
+      fs.readFile(
+        `${path.resolve(__dirname + "/../uploads/images")}/${
+          request.params.image
+        }`,
+        (err, content) => {
+          if (err) {
+            response.status(HttpResponse.BadRequest).send("not-found");
+          } else {
+            response.writeHead(200, { "Content-type": "image/jpg" });
+            response.end(content);
+          }
+        }
+      );
     }
   }
 
