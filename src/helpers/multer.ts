@@ -17,9 +17,9 @@ import * as path from "path";
  * Storage para imagenes
  */
 
-var imageStorage = multer.diskStorage({
+var storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.resolve(__dirname + "/../uploads/images"));
+    cb(null, path.resolve(__dirname + "/../uploads"));
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}.${file.mimetype.split("/")[1]}`);
@@ -101,11 +101,13 @@ export class Multer {
    */
 
   /**
-   * Guarda una imagen en la carpteta /uploads/images
+   * Guarda una un archivo, cualquiera en la carpeta temporal /uploads
    */
-  public static uploadImage() {
-    return multer({ storage: imageStorage });
+  public static uploadAny() {
+    return multer({ storage: storage });
   }
+  /**
+ 
 
   /**
    * Guarda un avatar en la carpteta /uploads/avatars

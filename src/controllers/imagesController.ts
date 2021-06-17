@@ -37,7 +37,9 @@ export class ImageController extends BaseController {
     response
       .status(HttpResponse.Ok)
       .send(
-        `[OK] Mensaje de bienvenida enviado con éxito ${Environment.get()}`
+        `[OK] Mensaje de bienvenida enviado con éxito ${Environment.get()} ${
+          process.env.NODE_ENV
+        } ${process.env.bucket}`
       );
   }
 
@@ -48,29 +50,38 @@ export class ImageController extends BaseController {
    */
 
   public async uploadImage(request: Request, response: Response) {
-    let upload = Multer.uploadImage().single("image");
+    let upload = Multer.uploadAny().single("image");
 
     upload(request, response, (err) => {
       if (err || !request.file) {
         response.status(HttpResponse.BadRequest).send("error-uploading-file");
       } else {
-        AWSS3.uploadToS3(path.resolve(__dirname + `/../uploads/images/${request.file.filename}`),request.file.filename).then((data)=>{
-          console.log("success",data);
-          Image.new(
-            `${
-              Environment.get() === Environment.Production ? "https" : "http"
-            }://${request.headers.host}/v1/image/get/${request.file.filename}`,
-            request.file.size
-          ).then((image) => {
-            response.status(HttpResponse.Ok).json(image.url);
+        const bucket = process.env.bucket || "sportyeah-test";
+        const originalPath = path.resolve(
+          __dirname + `/../uploads/${request.file.filename}`
+        );
+        AWSS3.uploadToS3(
+          originalPath,
+          `images/${request.file.filename}`,
+          bucket
+        )
+          .then(async (data) => {
+            console.log("success", data);
+            fs.unlinkSync(originalPath);
+            Image.new(
+              `${
+                Environment.get() === Environment.Production ? "https" : "http"
+              }://${request.headers.host}/v1/image/get/${
+                request.file.filename
+              }`,
+              request.file.size
+            ).then((image) => {
+              response.status(HttpResponse.Ok).json(image.url);
+            });
+          })
+          .catch((err) => {
+            console.log("err", err);
           });
-        })
-        .catch((err)=>{
-          console.log("err",err);
-          
-        })
-
-        
       }
     });
   }
@@ -81,31 +92,21 @@ export class ImageController extends BaseController {
    * @method get
    */
   public async getImage(request: Request, response: Response) {
-    
     try {
-      const data  = await AWSS3.s3.getObject({
-        Bucket:"sportyeah",
-        Key: `images/${request.params.image}`
-      }).promise()
-  
+      const Bucket = process.env.bucket || "sportyeah-test";
+
+      const data = await AWSS3.s3
+        .getObject({
+          Bucket,
+          Key: `images/${request.params.image}`,
+        })
+        .promise();
+
       response.writeHead(200, { "Content-type": "image/jpg" });
       response.end(data.Body);
-  
     } catch (error) {
       response.status(HttpResponse.BadRequest).send("not-found");
     }
- 
-    // fs.readFile(
-    //   `${path.resolve(__dirname + "/../uploads/images")}/${
-    //     request.params.image
-    //   }`,
-    //   (err, content) => {
-    //     if (err) {
-    //       response.status(HttpResponse.BadRequest).send("not-found");
-    //     } else {
-    //     }
-    //   }
-    // );
   }
 
   /**
@@ -120,7 +121,6 @@ export class ImageController extends BaseController {
     var file = fs.createWriteStream(
       path.resolve(__dirname + "/../uploads/images/" + imageName)
     );
-
 
     var res = https.get(url, (resp) => {
       if (resp.statusCode == 200) {
@@ -152,6 +152,4 @@ export class ImageController extends BaseController {
     let size = `${(info[0].totalSize / 1000000 / 1000).toFixed(2)} GB`;
     response.status(HttpResponse.Ok).json({ images, size });
   }
-
-
 }

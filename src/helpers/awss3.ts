@@ -35,11 +35,13 @@ export class AWSS3 {
 
   public static s3 = s3
 
-  public static async uploadToS3(originalPath:string,name:string) {
+  public static async uploadToS3(originalPath:string,Key:string,Bucket:string) {
+    console.log(Bucket);
+    
     var params = {
-      Bucket: 'sportyeah',
+      Bucket,
       Body : fs.createReadStream(originalPath),
-      Key : `images/${name}`
+      Key
     };
     
   
