@@ -62,8 +62,7 @@ export class ImageController extends BaseController {
         );
         AWSS3.uploadToS3(
           originalPath,
-          `images/${request.file.filename}`,
-          bucket
+          `images/${request.file.filename}`
         )
           .then(async (data) => {
             console.log("success", data);

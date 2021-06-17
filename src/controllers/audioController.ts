@@ -7,6 +7,7 @@ import * as fs from "fs";
 
 import * as path from "path";
 import { Environment } from "../helpers/environment";
+import { AWSS3 } from "../helpers/awss3";
 
 /**
  * AudioController
@@ -40,24 +41,36 @@ export class AudioController extends BaseController {
   }
 
   public upload(request: Request, response: Response) {
-    let upload = Multer.uploadAudio().single("audio");
+    let upload = Multer.uploadAny().single("audio");
 
     upload(request, response, (err) => {
       if (err || !request.file) {
         response.status(HttpResponse.BadRequest).send("error-uploading-audio");
       } else {
-        Audio.saveAudio({
-          name: request.file.filename,
-          size: request.file.size,
-          duration: request.body.duration,
-        }).then((audio) => {
-          response
-            .status(HttpResponse.Ok)
-            .json(
-              `${
-                Environment.get() === Environment.Development ? "http" : "https"
-              }://${request.headers.host}/v1/audio/get/${request.file.filename}`
-            );
+        console.log(request.file);
+        const originalPath = request.file.path;
+
+        const key = `audios/${request.file.filename}`
+        AWSS3.uploadToS3(originalPath,key)
+        .then((data)=>{
+          console.log("success", data);
+            fs.unlinkSync(originalPath);
+          Audio.saveAudio({
+            name: request.file.filename,
+            size: request.file.size,
+            duration: request.body.duration,
+          }).then((audio) => {
+            response
+              .status(HttpResponse.Ok)
+              .json(
+                `${
+                  Environment.get() === Environment.Development ? "http" : "https"
+                }://${request.headers.host}/v1/audio/get/${request.file.filename}`
+              );
+          });
+        })
+        .catch((err) => {
+          console.log("err", err);
         });
       }
     });
@@ -69,18 +82,33 @@ export class AudioController extends BaseController {
    * @method get
    */
   public async getAudio(request: Request, response: Response) {
-    fs.readFile(
-      `${path.resolve(__dirname + "/../uploads/audios")}/${
-        request.params.audio
-      }`,
-      (err, content) => {
-        if (err) {
-          response.status(HttpResponse.BadRequest).send("not-found");
-        } else {
-          response.writeHead(200, { "Content-type": "audio/ogg" });
-          response.end(content);
+    try {
+      const Bucket = process.env.bucket || "sportyeah-test";
+
+      const data = await AWSS3.s3
+        .getObject({
+          Bucket,
+          Key: `audios/${request.params.audio}`,
+        })
+        .promise();
+
+      response.writeHead(200, { "Content-type": "audio/ogg" });
+      response.end(data.Body);
+    } catch (error) {
+      fs.readFile(
+        `${path.resolve(__dirname + "/../uploads/audios")}/${
+          request.params.audio
+        }`,
+        (err, content) => {
+          if (err) {
+            response.status(HttpResponse.BadRequest).send("not-found");
+          } else {
+            response.writeHead(200, { "Content-type": "audio/ogg" });
+            response.end(content);
+          }
         }
-      }
-    );
+      );
+    }
+    
   }
 }

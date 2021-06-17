@@ -35,13 +35,8 @@ export class AWSS3 {
 
   public static s3 = s3;
 
-  public static async uploadToS3(
-    originalPath: string,
-    Key: string,
-    Bucket: string
-  ) {
-    console.log(Bucket);
-
+  public static async uploadToS3(originalPath: string, Key: string) {
+    const Bucket = this.getBucket();
     var params = {
       Bucket,
       Body: fs.createReadStream(originalPath),
@@ -49,5 +44,9 @@ export class AWSS3 {
     };
 
     return s3.upload(params).promise();
+  }
+
+  public static getBucket(): string {
+    return process.env.bucket || "sportyeah-test";
   }
 }
