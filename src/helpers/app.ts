@@ -54,10 +54,10 @@ export class App {
     this.app.use(
       cors({
         origin: [
+          "https://app.kecuki.com",
           "https://app.sportyeah.com",
           "https://admin.kecuki.com",
           "https://admin.sportyeah.com",
-          "https://app.kecuki.com",
           "http://localhost:8100",
           "http://localhost:4200",
           "capacitor://localhost",
