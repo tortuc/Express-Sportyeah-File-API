@@ -46,69 +46,69 @@ export class VideoController extends BaseController {
             .status(HttpResponse.BadRequest)
             .send("error-uploading-video");
         } else {
-          let videopath = path.resolve(
-            __dirname + `/../uploads/videos/${request.file.filename}`
-          );
-
-          if (process.env.app != "sportyeah") {
-            Video.saveVideo({
-              name: request.file.filename,
-              size: request.file.size,
+          // let videopath = path.resolve(
+          //   __dirname + `/../uploads/videos/${request.file.filename}`
+          // );
+          Video.saveVideo({
+            name: request.file.filename,
+            size: request.file.size,
+          })
+            .then((video) => {
+              response
+                .status(HttpResponse.Ok)
+                .json(
+                  `${
+                    Environment.get() === Environment.Development
+                      ? "http"
+                      : "https"
+                  }://${request.headers.host}/v1/video/get/${
+                    request.file.filename
+                  }`
+                );
             })
-              .then((video) => {
-                response
-                  .status(HttpResponse.Ok)
-                  .json(
-                    `${
-                      Environment.get() === Environment.Development
-                        ? "http"
-                        : "https"
-                    }://${request.headers.host}/v1/video/get/${
-                      request.file.filename
-                    }`
-                  );
-              })
-              .catch((err) => {
-                console.log(err);
+            .catch((err) => {
+              console.log(err);
 
-                response
-                  .status(HttpResponse.BadRequest)
-                  .send("error-uploading-video");
-              });
-          } else {
-            FFMPEG.concatVideo(videopath)
-              .then((newname) => {
-                Video.saveVideo({
-                  name: newname,
-                  size: request.file.size,
-                })
-                  .then((video) => {
-                    response
-                      .status(HttpResponse.Ok)
-                      .json(
-                        `${
-                          Environment.get() === Environment.Development
-                            ? "http"
-                            : "https"
-                        }://${request.headers.host}/v1/video/get/${newname}`
-                      );
-                  })
-                  .catch((err) => {
-                    console.log(err);
+              response
+                .status(HttpResponse.BadRequest)
+                .send("error-uploading-video");
+            });
+          // if (process.env.app != "sportyeah") {
+          
+          // } else {
+          //   FFMPEG.concatVideo(videopath)
+          //     .then((newname) => {
+          //       Video.saveVideo({
+          //         name: newname,
+          //         size: request.file.size,
+          //       })
+          //         .then((video) => {
+          //           response
+          //             .status(HttpResponse.Ok)
+          //             .json(
+          //               `${
+          //                 Environment.get() === Environment.Production
+          //                   ? "https"
+          //                   : "http"
+          //               }://${request.headers.host}/v1/video/get/${newname}`
+          //             );
+          //         })
+          //         .catch((err) => {
+          //           console.log(err);
 
-                    response
-                      .status(HttpResponse.BadRequest)
-                      .send("error-uploading-video");
-                  });
-              })
-              .catch((err) => {
-                console.log(err);
+          //           response
+          //             .status(HttpResponse.BadRequest)
+          //             .send("error-uploading-video");
+          //         });
+          //     })
+          //     .catch((err) => {
+          //       console.log(err);
 
-                response
-                  .status(HttpResponse.BadRequest)
-                  .send("error-uploading-video");
-              });
-          }
+          //       response
+          //         .status(HttpResponse.BadRequest)
+          //         .send("error-uploading-video");
+          //     });
+          // }
         }
       });
     } catch (error) {
