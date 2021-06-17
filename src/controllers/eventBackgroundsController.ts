@@ -54,7 +54,7 @@ export class EventBackgroundController extends BaseController {
         response.status(HttpResponse.BadRequest).send("error-uploading-file");
       } else {
         EventBackground.new({
-          url: `${Environment.get() === Environment.Production?'https':'http'}://${request.headers.host}/v1/background/get/${request.file.filename}`,
+          url: `${Environment.get() === Environment.Development?'http':'https'}://${request.headers.host}/v1/background/get/${request.file.filename}`,
           appName,
           typeEvent
         }).then((background) => {

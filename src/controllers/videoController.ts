@@ -60,9 +60,9 @@ export class VideoController extends BaseController {
                   .status(HttpResponse.Ok)
                   .json(
                     `${
-                      Environment.get() === Environment.Production
-                        ? "https"
-                        : "http"
+                      Environment.get() === Environment.Development
+                        ? "http"
+                        : "https"
                     }://${request.headers.host}/v1/video/get/${
                       request.file.filename
                     }`
@@ -87,9 +87,9 @@ export class VideoController extends BaseController {
                       .status(HttpResponse.Ok)
                       .json(
                         `${
-                          Environment.get() === Environment.Production
-                            ? "https"
-                            : "http"
+                          Environment.get() === Environment.Development
+                            ? "http"
+                            : "https"
                         }://${request.headers.host}/v1/video/get/${newname}`
                       );
                   })
@@ -139,7 +139,7 @@ export class VideoController extends BaseController {
             .status(HttpResponse.Ok)
             .json(
               `${
-                Environment.get() === Environment.Production ? "https" : "http"
+                Environment.get() === Environment.Development ? "http" : "https"
               }://${request.headers.host}/v1/video/get/${videoName}`
             );
         } else {

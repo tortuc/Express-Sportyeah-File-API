@@ -56,7 +56,7 @@ export class AvatarController extends BaseController
                 
                 response.status(HttpResponse.BadRequest).send('error-uploading-file')
             }else{
-                Avatar.new(`${Environment.get() === Environment.Production?'https':'http'}://${request.headers.host}/v1/avatar/get/${request.file.filename}`)
+                Avatar.new(`${Environment.get() === Environment.Development?'http':'https'}://${request.headers.host}/v1/avatar/get/${request.file.filename}`)
                     .then((avatar)=>{
                         response.status(HttpResponse.Ok).json(avatar)
                     })

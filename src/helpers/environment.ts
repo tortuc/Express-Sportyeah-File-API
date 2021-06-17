@@ -16,6 +16,7 @@ export class Environment {
   public static Development: Environment = new Environment("development");
 
   public static Production: Environment = new Environment("production");
+  public static Test: Environment = new Environment("test");
 
   /**
    * El entorno de despliegue de la aplicación
@@ -47,8 +48,18 @@ export class Environment {
    */
   public static get(): Environment {
     // si la variable de entorno es production entonces se carga en production
-    return process.env.NODE_ENV === "production"
-      ? Environment.Production
-      : Environment.Development;
+    switch (process.env.NODE_ENV) {
+      case "production":
+        return Environment.Production
+        break;
+      case "test":
+        return Environment.Test
+        break;
+    
+      default:
+        return Environment.Development
+
+        break;
+    }
   }
 }

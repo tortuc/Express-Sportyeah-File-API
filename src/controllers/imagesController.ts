@@ -57,7 +57,7 @@ export class ImageController extends BaseController {
 
         Image.new(
           `${
-            Environment.get() === Environment.Production ? "https" : "http"
+            Environment.get() === Environment.Development ? "http" : "https"
           }://${request.headers.host}/v1/image/get/${request.file.filename}`,
           request.file.size
         ).then((image) => {
@@ -114,7 +114,7 @@ export class ImageController extends BaseController {
 
         Image.new(
           `${
-            Environment.get() === Environment.Production ? "https" : "http"
+            Environment.get() === Environment.Development ? "http" : "https"
           }://${request.headers.host}/v1/image/get/${imageName}`,
           0
         ).then((image) => {

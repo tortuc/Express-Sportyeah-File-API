@@ -68,33 +68,39 @@ export class Mongoose {
 
   public start(): Promise<any> {
     return new Promise((resolve, reject) => {
-        let connectionString: string;
-        let auth = null;
-        if (Environment.get() == Environment.Development) {
-          connectionString = `mongodb://${Config.get(
-            "mongo.development.server"
-          )}:${Config.get("mongo.development.port")}/${Config.get(
-            "mongo.development.database"
-          )}`;
-        } else {
-          connectionString = `mongodb://${Config.get(
-            "mongo.production.server"
-          )}:${Config.get("mongo.production.port")}/${Config.get(
-            "mongo.production.database"
-          )}`;
-          auth = {
-            user: Config.get("mongo.production.username"),
-            password: Config.get("mongo.production.password"),
-          };
-        }
-  
-        connect(connectionString, {
-          useCreateIndex: true,
-          useNewUrlParser: true,
-          useUnifiedTopology: true,
-          useFindAndModify: false,
-          auth,
-        })
+      let connectionString: string;
+      let auth = null;
+      if (Environment.get() == Environment.Development) {
+        connectionString = `mongodb://${Config.get(
+          "mongo.development.server"
+        )}:${Config.get("mongo.development.port")}/${Config.get(
+          "mongo.development.database"
+        )}`;
+      } else if (Environment.get() == Environment.Test) {
+        connectionString = `mongodb://${Config.get(
+          "mongo.test.server"
+        )}:${Config.get("mongo.test.port")}/${Config.get(
+          "mongo.test.database"
+        )}`;
+      } else {
+        connectionString = `mongodb://${Config.get(
+          "mongo.production.server"
+        )}:${Config.get("mongo.production.port")}/${Config.get(
+          "mongo.production.database"
+        )}`;
+        auth = {
+          user: Config.get("mongo.production.username"),
+          password: Config.get("mongo.production.password"),
+        };
+      }
+
+      connect(connectionString, {
+        useCreateIndex: true,
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false,
+        auth,
+      })
         .then(() => {
           resolve(connectionString);
         })
