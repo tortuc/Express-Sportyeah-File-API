@@ -56,11 +56,8 @@ export class ImageController extends BaseController {
       if (err || !request.file) {
         response.status(HttpResponse.BadRequest).send("error-uploading-file");
       } else {
-        const originalPath = request.file.path
-        AWSS3.uploadToS3(
-          originalPath,
-          `images/${request.file.filename}`
-        )
+        const originalPath = request.file.path;
+        AWSS3.uploadToS3(originalPath, `images/${request.file.filename}`)
           .then(async (data) => {
             fs.unlinkSync(originalPath);
             Image.new(
@@ -75,7 +72,7 @@ export class ImageController extends BaseController {
             });
           })
           .catch((err) => {
-            response.status(HttpResponse.BadRequest).send(err)
+            response.status(HttpResponse.BadRequest).send(err);
           });
       }
     });
@@ -125,28 +122,34 @@ export class ImageController extends BaseController {
     const { url } = request.body;
 
     var imageName = Date.now() + ".jpg";
-    var file = fs.createWriteStream(
-      path.resolve(__dirname + "/../uploads/images/" + imageName)
+    const originalPath = path.resolve(
+      __dirname + "/../uploads/" + imageName
     );
+    var file = fs.createWriteStream(originalPath);
 
     var res = https.get(url, (resp) => {
       if (resp.statusCode == 200) {
         resp.pipe(file);
 
-        console.log(
-          fs.statSync(
-            path.resolve(__dirname + "/../uploads/images/" + imageName)
-          )
-        );
+        
+        const key = `images/${imageName}`
 
-        Image.new(
-          `${
-            Environment.get() === Environment.Development ? "http" : "https"
-          }://${request.headers.host}/v1/image/get/${imageName}`,
-          0
-        ).then((image) => {
-          response.status(HttpResponse.Ok).json(image.url);
-        });
+        AWSS3.uploadToS3(originalPath,key).then(()=>{
+            fs.unlinkSync(originalPath)
+            Image.new(
+              `${
+                Environment.get() === Environment.Development ? "http" : "https"
+              }://${request.headers.host}/v1/image/get/${imageName}`,
+              0
+            ).then((image) => {
+              response.status(HttpResponse.Ok).json(image.url);
+            });
+        })
+        .catch((err)=>{
+          response.status(HttpResponse.BadRequest).send(err)
+        })
+
+       
       } else {
         response.status(HttpResponse.BadRequest).send("error-uploading-file");
       }
