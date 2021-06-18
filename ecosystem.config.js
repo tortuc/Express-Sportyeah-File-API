@@ -10,33 +10,11 @@ module.exports = {
       },
       env_production: {
         NODE_ENV: "production",
-        bucket: "sportyeah-test",
+        bucket: "sportyeah",
       },
       env_test: {
         NODE_ENV: "test",
         bucket: "sportyeah-test",
-      },
-      env_production_sportyeah: {
-        NODE_ENV: "production",
-        app: "sportyeah",
-        bucket: "sportyeah",
-      },
-
-      env_production_kecuki: {
-        NODE_ENV: "production",
-        app: "kecuki",
-        bucket: "kecuki",
-      },
-      env_test_sportyeah: {
-        NODE_ENV: "test",
-        app: "sportyeah",
-        bucket: "sportyeah-test",
-      },
-
-      env_test_kecuki: {
-        NODE_ENV: "production",
-        app: "kecuki",
-        bucket: "kecuki-test",
       },
     },
   ],
