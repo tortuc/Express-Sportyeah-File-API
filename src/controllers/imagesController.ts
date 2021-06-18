@@ -56,16 +56,12 @@ export class ImageController extends BaseController {
       if (err || !request.file) {
         response.status(HttpResponse.BadRequest).send("error-uploading-file");
       } else {
-        const bucket = process.env.bucket || "sportyeah-test";
-        const originalPath = path.resolve(
-          __dirname + `/../uploads/${request.file.filename}`
-        );
+        const originalPath = request.file.path
         AWSS3.uploadToS3(
           originalPath,
           `images/${request.file.filename}`
         )
           .then(async (data) => {
-            console.log("success", data);
             fs.unlinkSync(originalPath);
             Image.new(
               `${
@@ -79,7 +75,7 @@ export class ImageController extends BaseController {
             });
           })
           .catch((err) => {
-            console.log("err", err);
+            response.status(HttpResponse.BadRequest).send(err)
           });
       }
     });

@@ -2,7 +2,6 @@ import { BaseController } from "./baseController";
 import { HttpResponse } from "../helpers/httpResponse";
 import { Request, Response } from "express";
 import { Multer } from "../helpers/multer";
-import Audio from "../models/audio";
 import * as fs from "fs";
 
 import * as path from "path";
@@ -10,6 +9,7 @@ import Video from "../models/video";
 import https = require("https");
 import { Environment } from "../helpers/environment";
 import { FFMPEG } from "../helpers/ffmpeg";
+import { AWSS3 } from "../helpers/awss3";
 
 /**
  * VideoController
@@ -31,14 +31,9 @@ export class VideoController extends BaseController {
 
   public upload(request: Request, response: Response) {
     try {
-      console.log("uploading video...");
-
-      let upload = Multer.uploadVideo().single("video");
-      console.log("video...");
+      let upload = Multer.uploadAny().single("video");
 
       upload(request, response, (err) => {
-        console.log("video cargado");
-
         if (err || !request.file) {
           console.log(err);
 
@@ -46,35 +41,34 @@ export class VideoController extends BaseController {
             .status(HttpResponse.BadRequest)
             .send("error-uploading-video");
         } else {
-          // let videopath = path.resolve(
-          //   __dirname + `/../uploads/videos/${request.file.filename}`
-          // );
-          Video.saveVideo({
-            name: request.file.filename,
-            size: request.file.size,
-          })
-            .then((video) => {
-              response
-                .status(HttpResponse.Ok)
-                .json(
-                  `${
-                    Environment.get() === Environment.Development
-                      ? "http"
-                      : "https"
-                  }://${request.headers.host}/v1/video/get/${
-                    request.file.filename
-                  }`
-                );
+          
+          const originalPath = request.file.path;
+          const name = request.file.filename;
+          const key = `videos/${name}`;
+          AWSS3.uploadToS3(originalPath, key)
+            .then((data) => {
+              fs.unlinkSync(originalPath);
+              Video.saveVideo({
+                name: name,
+                size: request.file.size,
+              }).then((video) => {
+                response
+                  .status(HttpResponse.Ok)
+                  .json(
+                    `${
+                      Environment.get() === Environment.Development
+                        ? "http"
+                        : "https"
+                    }://${request.headers.host}/v1/video/get/${name}`
+                  );
+              });
             })
             .catch((err) => {
-              console.log(err);
-
-              response
-                .status(HttpResponse.BadRequest)
-                .send("error-uploading-video");
+              response.status(HttpResponse.BadRequest).send(err);
             });
+
           // if (process.env.app != "sportyeah") {
-          
+
           // } else {
           //   FFMPEG.concatVideo(videopath)
           //     .then((newname) => {
@@ -155,19 +149,32 @@ export class VideoController extends BaseController {
    * @method get
    */
   public async getVideo(request: Request, response: Response) {
-    fs.readFile(
-      `${path.resolve(__dirname + "/../uploads/videos")}/${
-        request.params.video
-      }`,
-      (err, content) => {
-        if (err) {
-          response.status(HttpResponse.BadRequest).send("not-found");
-        } else {
-          response.writeHead(200, { "Content-type": "video/ogg" });
-          response.end(content);
+    const video = request.params.video;
+    try {
+      const Bucket = process.env.bucket || "sportyeah-test";
+
+      const data = await AWSS3.s3
+        .getObject({
+          Bucket,
+          Key: `videos/${video}`,
+        })
+        .promise();
+
+      response.writeHead(200, { "Content-type": "video/ogg" });
+      response.end(data.Body);
+    } catch (error) {
+      fs.readFile(
+        `${path.resolve(__dirname + "/../uploads/videos")}/${video}`,
+        (err, content) => {
+          if (err) {
+            response.status(HttpResponse.BadRequest).send("not-found");
+          } else {
+            response.writeHead(200, { "Content-type": "video/ogg" });
+            response.end(content);
+          }
         }
-      }
-    );
+      );
+    }
   }
 
   public async getTotalVideos(request: Request, response: Response) {

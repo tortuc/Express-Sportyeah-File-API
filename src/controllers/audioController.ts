@@ -70,7 +70,7 @@ export class AudioController extends BaseController {
           });
         })
         .catch((err) => {
-          console.log("err", err);
+          response.status(HttpResponse.BadRequest).send(err)
         });
       }
     });
