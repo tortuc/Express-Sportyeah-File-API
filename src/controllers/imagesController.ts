@@ -122,34 +122,33 @@ export class ImageController extends BaseController {
     const { url } = request.body;
 
     var imageName = Date.now() + ".jpg";
-    const originalPath = path.resolve(
-      __dirname + "/../uploads/" + imageName
-    );
+    const originalPath = path.resolve(__dirname + "/../uploads/" + imageName);
     var file = fs.createWriteStream(originalPath);
 
     var res = https.get(url, (resp) => {
       if (resp.statusCode == 200) {
-        resp.pipe(file);
+        resp
+          .pipe(file)
+          .on("finish", () => {
+            const key = `images/${imageName}`;
 
-        
-        const key = `images/${imageName}`
-
-        AWSS3.uploadToS3(originalPath,key).then(()=>{
-            fs.unlinkSync(originalPath)
-            Image.new(
-              `${
-                Environment.get() === Environment.Development ? "http" : "https"
-              }://${request.headers.host}/v1/image/get/${imageName}`,
-              0
-            ).then((image) => {
-              response.status(HttpResponse.Ok).json(image.url);
+            AWSS3.uploadToS3(originalPath, key).then(() => {
+              fs.unlinkSync(originalPath);
+              Image.new(
+                `${
+                  Environment.get() === Environment.Development
+                    ? "http"
+                    : "https"
+                }://${request.headers.host}/v1/image/get/${imageName}`,
+                0
+              ).then((image) => {
+                response.status(HttpResponse.Ok).json(image.url);
+              });
             });
-        })
-        .catch((err)=>{
-          response.status(HttpResponse.BadRequest).send(err)
-        })
-
-       
+          })
+          .on("error", (err) => {
+            response.status(HttpResponse.BadRequest).send(err);
+          });
       } else {
         response.status(HttpResponse.BadRequest).send("error-uploading-file");
       }

@@ -41,7 +41,6 @@ export class VideoController extends BaseController {
             .status(HttpResponse.BadRequest)
             .send("error-uploading-video");
         } else {
-          
           const originalPath = request.file.path;
           const name = request.file.filename;
           const key = `videos/${name}`;
@@ -120,22 +119,39 @@ export class VideoController extends BaseController {
     const { url } = request.body;
 
     var videoName = Date.now() + ".mp4";
-    var file = fs.createWriteStream(
-      path.resolve(__dirname + "/../uploads/videos/" + videoName)
-    );
+    const originalPath = path.resolve(__dirname + "/../uploads/" + videoName);
+
+    var file = fs.createWriteStream(originalPath);
 
     var res = https.get(url, (resp) => {
       const realUrl = resp.headers.location;
       https.get(realUrl, (resp) => {
         if (resp.statusCode == 200) {
-          resp.pipe(file);
-          response
-            .status(HttpResponse.Ok)
-            .json(
-              `${
-                Environment.get() === Environment.Development ? "http" : "https"
-              }://${request.headers.host}/v1/video/get/${videoName}`
-            );
+          resp
+            .pipe(file)
+            .on("finish", () => {
+              const key = `videos/${videoName}`;
+              AWSS3.uploadToS3(originalPath, key)
+                .then(() => {
+                  console.log("se subio a s3");
+                  fs.unlinkSync(originalPath);
+                  response
+                    .status(HttpResponse.Ok)
+                    .json(
+                      `${
+                        Environment.get() === Environment.Development
+                          ? "http"
+                          : "https"
+                      }://${request.headers.host}/v1/video/get/${videoName}`
+                    );
+                })
+                .catch((err) => {
+                  response.status(HttpResponse.BadRequest).send(err);
+                });
+            })
+            .on("error", (err) => {
+              response.status(HttpResponse.BadRequest).send(err);
+            });
         } else {
           response.status(HttpResponse.BadRequest).send("error-uploading-file");
         }
@@ -160,7 +176,7 @@ export class VideoController extends BaseController {
         })
         .promise();
 
-      response.writeHead(200, { "Content-type": "video/ogg" });
+      response.writeHead(200, { "Content-type": "video/mp4" });
       response.end(data.Body);
     } catch (error) {
       fs.readFile(
@@ -169,7 +185,7 @@ export class VideoController extends BaseController {
           if (err) {
             response.status(HttpResponse.BadRequest).send("not-found");
           } else {
-            response.writeHead(200, { "Content-type": "video/ogg" });
+            response.writeHead(200, { "Content-type": "video/mp4" });
             response.end(content);
           }
         }
