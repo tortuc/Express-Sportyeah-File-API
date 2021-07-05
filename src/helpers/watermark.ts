@@ -3,6 +3,8 @@ import * as path from "path";
 import * as fs from 'fs'
 
 const fluentffmpeg = require('fluent-ffmpeg');
+const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+fluentffmpeg.setFfmpegPath(ffmpegPath);
 var Jimp = require('jimp');
 //const exec = require("child_process").execSync;
 const { spawn, exec } = require('child_process')
@@ -23,7 +25,6 @@ export class Watermark {
 
         const VIDEO_PATH = path.resolve(__dirname + '/../uploads/videos/') + "/" + VIDEO;
         const WATERMARK_PATH = path.resolve(__dirname + '/../assets/') + '/imagotipo_negro.png';
-
         const data = [
             {
                 "value": USER,
@@ -33,14 +34,13 @@ export class Watermark {
 
         const NAMELOGO = Date.now();
 
-        this.createImage(data, WATERMARK_PATH, NAMELOGO);
+        await this.createImage(data, WATERMARK_PATH, NAMELOGO);
 
-        this.createImageSplash(data, NAMELOGO);
+        await this.createImageSplash(data, NAMELOGO);
 
         //this.reziseVideo(VIDEO);
 
-
-        fluentffmpeg()
+        await fluentffmpeg()
             .input(path.resolve(__dirname + '/../assets/') + "/" + NAMELOGO + "_splash.jpg")
             .size('640x480').autopad()
             .loop(3.5)
@@ -50,9 +50,9 @@ export class Watermark {
 
             })
             .run();
+        console.log('VIDEO_PATH =>', VIDEO_PATH)
 
-
-        fluentffmpeg()
+        await fluentffmpeg()
             .input(VIDEO_PATH)
             .input(path.resolve(__dirname + '/../assets/') + `/${NAMELOGO}_watermark.png`)
             .output(path.resolve(__dirname + "/../uploads/videos/") + "/" + VIDEO + "-watermark.mp4")
@@ -101,18 +101,17 @@ export class Watermark {
                       console.error(err);
                       return;
                     }
-                    console.log(stdout);
                     fs.unlinkSync(path.resolve(__dirname + '/../uploads/videos/') + `/${NAMELOGO}.mp43`);
                     fs.unlinkSync(path.resolve(__dirname + '/../uploads/videos/') + `/${VIDEO}.mp43`);
                     fs.unlinkSync(path.resolve(__dirname + '/../uploads/videos/') + `/${VIDEO}-watermark.mp4`);
                     fs.unlinkSync(path.resolve(__dirname + '/../uploads/videos/') + `/${NAMELOGO}_splash.mp4`);
-    
+
                   });
 
 
 
             })
-            .run()
+            .run();
 
 
 

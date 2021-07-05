@@ -16,13 +16,13 @@ import { Environment } from '../helpers/environment';
 
 /**
  * VideoController
- * 
+ *
  * Explica el objeto de este controlador
- *  
+ *
  * @author Jogeiker L <jogeiker1999@gmail.com>
  * @copyright JDV
  */
- 
+
  async function myAwesomeFunction() {
     setTimeout(() => {}, 100, "foo");
   }
@@ -39,8 +39,8 @@ export class VideoController extends BaseController
     }
 
 
-    
- 
+
+
 
     public async upload(request:Request,response:Response){
        try {
@@ -54,19 +54,19 @@ export class VideoController extends BaseController
 
         console.log('video...');
 
-       
+
         upload(request,response,err=>{
             console.log('video cargado');
-            
+
             if(err || !request.file){
                 console.log(err);
-                
+
                 response.status(HttpResponse.BadRequest).send('error-uploading-video')
             }else{
                 Video.saveVideo({
                     name:request.file.filename,
                     size:request.file.size
-                    
+
                 })
                     .then((video)=>{
 
@@ -74,7 +74,7 @@ export class VideoController extends BaseController
 
                         const watermarkR = new Watermark();
                         watermarkR.createVideoWatermark(request.file.filename,request.body.user)
-                        
+
                         response.status(HttpResponse.Ok).json(
                             `${Environment.get() === Environment.Production?'https':'http'}://${request.headers.host}/v1/video/get/${request.file.filename}`
                         )
@@ -83,14 +83,14 @@ export class VideoController extends BaseController
                         console.log(err);
 
                                     response.status(HttpResponse.BadRequest).send('error-uploading-video')
-    
+
                     })
-            }         
-            
+            }
+
          })
        } catch (error) {
            console.log(error);
-           
+
        }
 
 
@@ -98,8 +98,8 @@ export class VideoController extends BaseController
 
     /**
       * Subir video desde URL
-     * @route /v1/video/uploadFromUrl 
-     * @method post 
+     * @route /v1/video/uploadFromUrl
+     * @method post
      */
 
     public async uploadVideoFromUrl(request:Request,response:Response) {
@@ -118,7 +118,7 @@ export class VideoController extends BaseController
                     )
                 }else{
                     response.status(HttpResponse.BadRequest).send('error-uploading-file')
-                }         
+                }
             })
         })
 
@@ -126,21 +126,21 @@ export class VideoController extends BaseController
 
      /**
       * Obtener un video del servidor
-     * @route /v1/video/get/:video 
-     * @method get 
+     * @route /v1/video/get/:video
+     * @method get
      */
     public async getVideo(request:Request,response:Response){
 
-        fs.readFile( `${path.resolve(__dirname + '/../uploads/videos')}/${request.params.video}`, (err, content) => {
+        fs.readFile( `${path.resolve(__dirname + '/../uploads/videos')}/${request.params.video}.mp4`, (err, content) => {
             if (err) {
-                response.status(HttpResponse.BadRequest).send('not-found')        
+                response.status(HttpResponse.BadRequest).send('not-found')
             } else {
                 response.writeHead(200,{'Content-type':'video/ogg'});
                 response.end(content);
             }
         });
-            
-     
+
+
     }
 
 

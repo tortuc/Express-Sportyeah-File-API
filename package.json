@@ -17,6 +17,7 @@
   "author": "JDV",
   "license": "ISC",
   "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.0.20",
     "@types/multer": "^1.4.4",
     "@types/node": "^14.11.2",
     "@unaxiom/ffmpeg": "^0.1.2",
